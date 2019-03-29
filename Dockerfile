@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.8
 
 MAINTAINER Paul Schoenfelder <paulschoenfelder@gmail.com>
 
@@ -22,8 +22,8 @@ RUN \
     adduser -s /bin/sh -u 1001 -G root -h "${HOME}" -S -D default && \
     chown -R 1001:0 "${HOME}" && \
     # Add tagged repos as well as the edge repo so that we can selectively install edge packages
-    echo "@main http://dl-cdn.alpinelinux.org/alpine/v3.9/main" >> /etc/apk/repositories && \
-    echo "@community http://dl-cdn.alpinelinux.org/alpine/v3.9/community" >> /etc/apk/repositories && \
+    echo "@main http://dl-cdn.alpinelinux.org/alpine/v3.8/main" >> /etc/apk/repositories && \
+    echo "@community http://dl-cdn.alpinelinux.org/alpine/v3.8/community" >> /etc/apk/repositories && \
     echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
     apk --no-cache --update --available upgrade && \
@@ -33,6 +33,7 @@ RUN \
       bash \
       ca-certificates \
       openssl-dev \
+      openssl \
       ncurses-dev \
       unixodbc-dev \
       zlib-dev && \
@@ -46,6 +47,7 @@ RUN \
     export ERL_TOP=/tmp/erlang-build && \
     export PATH=$ERL_TOP/bin:$PATH && \
     export CPPFlAGS="-D_BSD_SOURCE $CPPFLAGS" && \
+    export CFLAGS="-DOPENSSL_NO_EC=1" && \
     # Configure
     ./otp_build autoconf && \
     ./configure --prefix=/usr \
@@ -104,4 +106,4 @@ RUN \
 
 WORKDIR ${HOME}
 
-CMD ["/bin/sh"]
+CMD ["/bin/bash"]
